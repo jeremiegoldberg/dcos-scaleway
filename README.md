@@ -33,6 +33,10 @@ It's pretty long considering it has to create all machines and security rules. W
 
 Once the console hangs giving you installer url go to https://<ip_of_any_master>:9000/
 
+The terraform script will fill the masters' & slaves' IP addresses.
+
 Follow the steps specified [here](https://dcos.io/docs/1.7/administration/installing/custom/gui/)
+
+Copy/Paste **your ssh private key** (Corresponding to the ssh key you use to connect to your scaleway servers) into the GUI and choose the **ip_script.sh file** as IP Detect script 
 
 Don't forget to kill the bootstrap server once done. 
