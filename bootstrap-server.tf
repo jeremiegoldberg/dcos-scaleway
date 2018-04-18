@@ -21,13 +21,19 @@ resource "scaleway_server" "bootstrap" {
     destination = "/tmp/config.sh"
   }
 
+  provisioner "file" {
+    source      = "~/.ssh/id_rsa"
+    destination = "/tmp/genconf/ssh_key"
+  }
+
   provisioner "remote-exec" {
     inline     = [
 	"service docker start",
 	"curl https://get.docker.com | sh",
 	"[ ! -f /tmp/dcos_generate_config.sh ] && wget -O /tmp/dcos_generate_config.sh https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh",
-	"bash /tmp/config.sh ${module.dcos001.internal_ip},${module.dcos002.internal_ip},${module.dcos003.internal_ip} ${module.dcos101.internal_ip},${module.dcos102.internal_ip},${module.dcos103.internal_ip} > /tmp/genconf/config.yaml",
-	"cd /tmp/ && bash dcos_generate_config.sh --web"
+	"bash /tmp/config.sh ${module.dcos001.internal_ip},${module.dcos002.internal_ip},${module.dcos003.internal_ip} ${module.dcos101.internal_ip},${module.dcos102.internal_ip},${module.dcos103.internal_ip},${module.dcos104.internal_ip},${module.dcos105.internal_ip} ${module.dcos201.internal_ip},${module.dcos202.internal_ip},${module.dcos203.internal_ip} > /tmp/genconf/config.yaml",
+	"chmod 600 /tmp/genconf/ssh_key",
+	"cd /tmp/ && bash dcos_generate_config.sh --install-prereqs && bash dcos_generate_config.sh --preflight && bash dcos_generate_config.sh --deploy"
 	]
   }
 

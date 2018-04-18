@@ -30,4 +30,14 @@ echo - 8.8.4.4
 echo ssh_key_path: genconf/ssh_key
 echo ssh_port: 22
 echo ssh_user: root
+echo public_agent_list:
+for k in  $(echo $3 | tr "," "\n")
+do
+        echo - $k
+        echo Host $k >> ~/.ssh/config
+#        echo "   Hostname $j" >> ~/.ssh/config
+        echo "   StrictHostKeyChecking no" >> ~/.ssh/config
+        echo >> ~/.ssh/config
+
+done
 

@@ -4,7 +4,7 @@
 
 data "scaleway_image" "centos" {
   architecture = "x86_64"
-  name         = "CentOS 7.2"
+  name         = "CentOS 7.3"
 }
 
 
@@ -30,6 +30,12 @@ resource "scaleway_server" "server" {
       "ntpdate -s ntp.ubuntu.com",
     ]
   }
+
+  provisioner "file" {
+    source      = "daemon.json"
+    destination = "/etc/docker/daemon.json"
+  }
+
 }
 
 resource "scaleway_security_group_rule" "security-rule" {

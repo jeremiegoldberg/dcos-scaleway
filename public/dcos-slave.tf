@@ -7,12 +7,13 @@ data "scaleway_image" "centos" {
   name         = "CentOS 7.3"
 }
 
+
 resource "scaleway_server" "server" {
   name                = "${var.server_name}"
   image               = "${data.scaleway_image.centos.id}"
   type                = "VC1S"
   dynamic_ip_required = true
-  security_group      = "${var.security}"
+  security_group      = "${var.openbarsg}"
 
   provisioner "remote-exec" {
     inline = [
@@ -25,10 +26,10 @@ resource "scaleway_server" "server" {
     ]
   }
 
-#  provisioner "file" {
-#    source      = "../daemon.json"
-#    destination = "/etc/docker/daemon.json"
-#  }
+  provisioner "file" {
+    source      = "daemon.json"
+    destination = "/etc/docker/daemon.json"
+  }
 
 }
 
