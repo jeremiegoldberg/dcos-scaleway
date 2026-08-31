@@ -1,41 +1,64 @@
 # dcos-scaleway
 
-Here is the terraform code to pop up your first [DC/OS](https://mesosphere.com/blog/dcos-1_10-kubernetes/) cluster
+> A seven-node DC/OS cluster on Scaleway, described in Terraform. Written in
+> 2018, kept as a record of what orchestration looked like before Kubernetes
+> won.
 
-# Description :
+![Archived](https://img.shields.io/badge/status-archived%20%C2%B7%20not%20runnable-inactive)
+![Terraform](https://img.shields.io/badge/Terraform-0.11%20era-7B42BC?logo=terraform&logoColor=white)
+![Licence](https://img.shields.io/badge/licence-MIT-blue)
 
-The code as is will start 7 machines [on SCALEWAY](https://www.scaleway.com/), by far the cheapest easiest cloud provider I've found so far.
+## This will not run, and cannot be made to
 
-It will start :
+Three separate things it depends on no longer exist:
 
-* 3 VC1S ( 2 VCPUS, 2GB ram, €0.006/hour) as masters   
-* 3 VC1M ( 4 VCPUS, 4GB ram, €0.012/hour) as slaves
-* 1 VC1S as bootstrap server (kill it once the cluster is running)
+- **DC/OS** was discontinued. Mesosphere became D2iQ, D2iQ stopped supporting
+  DC/OS in 2021, and the installer this code points at is gone.
+- **The Scaleway Terraform provider v1** — the one that offered
+  `scaleway_server` and `scaleway_security_group` — was replaced by a v2 with a
+  different resource model. It is no longer served by the registry.
+- **VC1S and VC1M** instance types were retired years ago.
 
-# Terraform
+There is no patch that brings this back. Porting it would mean writing a
+different thing entirely, against a product that no longer ships. It stays here
+as it was, because what it records is worth keeping.
 
-If you're not familiar with [Terraform](https://www.terraform.io/) visit their [website](https://www.terraform.io/)
+## What it records
 
-Terraform Installation documentation is [here](https://www.terraform.io/intro/getting-started/install.html)
+Seven machines, described in files, in 2018:
 
-The scaleway plugin is [described here](https://www.terraform.io/docs/providers/scaleway/index.html)
+| Role | Count | Instance | Then |
+|---|---|---|---|
+| Masters | 3 | VC1S | €0.006/hour |
+| Agents | 3 | VC1M | €0.012/hour |
+| Bootstrap | 1 | VC1S | destroyed once the cluster was up |
 
-# Run the cluster
+The shape is the interesting part. Three masters for quorum, a separate
+bootstrap node whose entire purpose was to be thrown away after the install, an
+`ip_detect` shell script — `ip_script.sh` — because the scheduler could not work
+out a node's own address, and a GUI installer into which you pasted **your SSH
+private key** so it could reach the machines.
 
-```
-$ terraform init 
-$ terraform get
-$ terraform apply
+That last one is worth sitting with. In 2018 it was the documented procedure.
 
-```
-It's pretty long considering it has to create all machines and security rules. Wait for it.
+Everything DC/OS made you assemble by hand — the quorum, the agent registration,
+the address detection, the throwaway installer — is now either a managed control
+plane or three lines of YAML. The gap between this repository and a `kubeadm`
+command is the whole story of what happened to orchestration between 2018 and
+now.
 
-Once the console hangs giving you installer url go to https://<ip_of_any_master>:9000/
+## A note on the credentials in the history
 
-The terraform script will fill the masters' & slaves' IP addresses.
+The first commit contained a Scaleway `token` and `organization` in
+`provider.tf`. The file was deleted in a later commit, but git keeps everything,
+so both values are still readable in the history.
 
-Follow the steps specified [here](https://dcos.io/docs/1.7/administration/installing/custom/gui/)
+**They were revoked long ago.** They are left in place rather than rewritten
+because rewriting the history of an archive to hide a mistake would be a strange
+thing to do with a repository kept precisely as a record. The mistake is part of
+the record: in 2018 I committed a cloud token, and that is what committing a
+cloud token looks like six years later.
 
- * Copy/Paste **your ssh private key** (Corresponding to the ssh key you use to connect to your scaleway servers) into the GUI 
- * Choose the **ip_script.sh** file as IP Detect script 
- * Don't forget to kill the bootstrap server once done. 
+## Licence
+
+MIT.
